@@ -24,8 +24,8 @@ export default function Home() {
 
   return (
     <>
-      {/* HERO SECTION */}
-      <section id="home" className="relative h-[85vh] min-h-[600px] bg-black overflow-hidden -mt-20">
+      {/* HERO SECTION - Ajustado para não sobrepor o menu */}
+      <section id="home" className="relative h-[85vh] min-h-[600px] bg-black overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
             key={heroIndex}
@@ -36,15 +36,15 @@ export default function Home() {
             className="absolute inset-0"
           >
             <img 
-              src={heroCars[heroIndex].imagem} 
-              alt={heroCars[heroIndex].modelo}
+              src={heroCars[heroIndex]?.imagem} 
+              alt={heroCars[heroIndex]?.modelo}
               className="w-full h-full object-cover opacity-50"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
           </motion.div>
         </AnimatePresence>
 
-        <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 flex flex-col justify-center pt-20">
+        <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 flex flex-col justify-center">
           <motion.div
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -92,7 +92,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ABOUT US */}
+      {/* ABOUT US - As âncoras (id="sobre" e id="avaliacoes") estão exatas para o menu encontrar */}
       <section id="sobre" className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
