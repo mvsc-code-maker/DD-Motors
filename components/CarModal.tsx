@@ -8,6 +8,10 @@ import {
 } from 'lucide-react';
 import { WHATSAPP_NUMBER } from '@/data/estoque';
 
+// IMPORTAÇÕES DO FIREBASE (Descomente quando for ligar o banco de dados)
+// import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+// import { db } from '@/lib/firebase'; // Ajuste para o caminho do seu arquivo de configuração do Firebase
+
 interface CarModalProps {
   car: any;
   onClose: () => void;
@@ -17,41 +21,41 @@ export default function CarModal({ car, onClose }: CarModalProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   
-  // --- ESTADOS DO SIMULADOR DE FINANCIAMENTO ---
-  const [entradaPerc, setEntradaPerc] = useState(30); // Padrão de 30% de entrada
-  const [parcelas, setParcelas] = useState(48); // Padrão de 48x
-  const taxaJurosMensal = 0.0149; // 1,49% ao mês (ajuste conforme sua taxa real)
+  // ESTADOS DO FORMULÁRIO (Para enviar ao Firebase)
+  const [nome, setNome] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Reseta estados ao abrir novo carro
+  // ESTADOS DO SIMULADOR
+  const [entradaPerc, setEntradaPerc] = useState(30);
+  const [parcelas, setParcelas] = useState(48);
+  const taxaJurosMensal = 0.0149;
+
   useEffect(() => {
     if (car) {
       setCurrentIndex(0);
       setIsFullscreen(false);
       setEntradaPerc(30);
       setParcelas(48);
+      setNome('');
+      setCpf('');
+      setWhatsapp('');
     }
   }, [car]);
 
-  // Cálculos do Financiamento
   const { precoCarro, valorEntrada, valorFinanciado, valorParcela } = useMemo(() => {
     if (!car) return { precoCarro: 0, valorEntrada: 0, valorFinanciado: 0, valorParcela: 0 };
-    
-    // Converte a string "R$ 650.000" para número (650000)
     const preco = Number(car.preco.replace(/[^0-9]/g, ''));
-    
     const entrada = (preco * entradaPerc) / 100;
     const financiado = preco - entrada;
-    
-    // Fórmula de prestação (Tabela Price)
     let parcela = 0;
     if (financiado > 0) {
       parcela = (financiado * taxaJurosMensal) / (1 - Math.pow(1 + taxaJurosMensal, -parcelas));
     }
-
     return { precoCarro: preco, valorEntrada: entrada, valorFinanciado: financiado, valorParcela: parcela };
   }, [car, entradaPerc, parcelas]);
 
-  // Formatador de Moeda
   const formatadorBR = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
   if (!car) return null;
@@ -75,24 +79,51 @@ export default function CarModal({ car, onClose }: CarModalProps) {
     else if (offset.x > limiarDeArrasto) prevImage();
   };
 
-  const handleLeadSubmit = (e: React.FormEvent) => {
+  // FUNÇÃO QUE SALVA NO BANCO DE DADOS
+  const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Solicitação VIP enviada para análise de crédito. Um consultor entrará em contato.');
-    onClose();
+    setIsSubmitting(true);
+
+    try {
+      /* CÓDIGO DO FIREBASE (Descomente para funcionar de verdade)
+      await addDoc(collection(db, 'leads_financiamento'), {
+        nome: nome,
+        cpf: cpf,
+        whatsapp: whatsapp,
+        carro_id: car.id,
+        carro_modelo: `${car.marca} ${car.modelo}`,
+        simulacao: {
+          entrada_percentual: entradaPerc,
+          valor_entrada: valorEntrada,
+          parcelas: parcelas,
+          valor_parcela: valorParcela
+        },
+        status: 'Novo Lead',
+        data_criacao: serverTimestamp()
+      });
+      */
+
+      // Simulação visual de carregamento
+      setTimeout(() => {
+        alert('Dados enviados com sucesso! Nosso consultor entrará em contato para a aprovação.');
+        setIsSubmitting(false);
+        onClose();
+      }, 1000);
+
+    } catch (error) {
+      console.error("Erro ao salvar:", error);
+      alert('Ocorreu um erro. Tente novamente.');
+      setIsSubmitting(false);
+    }
   };
 
-  // Mensagem personalizada para o WhatsApp com os dados da simulação
   const msgWhatsApp = `Olá! Sou um cliente VIP e tenho interesse no ${car.marca} ${car.modelo}. Fiz uma simulação com entrada de ${formatadorBR.format(valorEntrada)} e vi as parcelas em ${parcelas}x de ${formatadorBR.format(valorParcela)}. Gostaria de seguir com a pré-aprovação.`;
 
   return (
     <>
-      {/* MODO TELA CHEIA (Mantido exatamente igual) */}
       <AnimatePresence>
         {isFullscreen && (
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black flex items-center justify-center touch-none"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] bg-black flex items-center justify-center touch-none">
             <button onClick={() => setIsFullscreen(false)} className="absolute top-6 right-6 z-50 w-12 h-12 bg-white/10 flex items-center justify-center rounded-full hover:bg-white/20 text-white transition-colors">
               <X className="w-6 h-6" />
             </button>
@@ -103,24 +134,14 @@ export default function CarModal({ car, onClose }: CarModalProps) {
               </>
             )}
             <motion.img 
-              key={`full-${currentIndex}`}
-              initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}
-              src={imagens[currentIndex]} alt={car.modelo}
-              className="w-full h-auto max-h-[90vh] object-contain cursor-grab active:cursor-grabbing"
+              key={`full-${currentIndex}`} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}
+              src={imagens[currentIndex]} alt={car.modelo} className="w-full h-auto max-h-[90vh] object-contain cursor-grab active:cursor-grabbing"
               drag={temMaisDeUmaFoto ? "x" : false} dragConstraints={{ left: 0, right: 0 }} dragElastic={0.2} onDragEnd={handleDragEnd}
             />
-            {temMaisDeUmaFoto && (
-              <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-2">
-                {imagens.map((_, idx) => (
-                  <div key={idx} className={`h-2 rounded-full transition-all ${idx === currentIndex ? 'w-8 bg-white' : 'w-2 bg-white/50'}`} />
-                ))}
-              </div>
-            )}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* MODAL PRINCIPAL */}
       <AnimatePresence>
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 sm:p-6">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/90 backdrop-blur-md" />
@@ -133,7 +154,7 @@ export default function CarModal({ car, onClose }: CarModalProps) {
               <X className="w-5 h-5" />
             </button>
 
-            {/* LADO ESQUERDO: GALERIA (Mantido igual) */}
+            {/* LADO ESQUERDO: GALERIA */}
             <div className="w-full lg:w-3/5 bg-zinc-950 flex flex-col relative h-[45vh] lg:h-auto overflow-hidden group">
               <div className="relative flex-1 w-full h-full flex items-center justify-center">
                 <AnimatePresence mode="wait">
@@ -164,9 +185,10 @@ export default function CarModal({ car, onClose }: CarModalProps) {
               )}
             </div>
             
-            {/* LADO DIREITO: INFORMAÇÕES VIP & SIMULADOR */}
+            {/* LADO DIREITO: INFORMAÇÕES E SIMULADOR */}
             <div className="w-full lg:w-2/5 p-8 sm:p-10 lg:p-12 flex flex-col bg-white overflow-y-auto max-h-[55vh] lg:max-h-none custom-scrollbar">
               
+              {/* HEADER DO CARRO */}
               <div className="mb-6 border-b border-zinc-100 pb-6">
                 <div className="flex items-center gap-3 mb-3">
                   <span className="text-xs font-bold bg-zinc-100 text-zinc-800 px-3 py-1 uppercase tracking-widest rounded-sm">{car.marca}</span>
@@ -176,63 +198,7 @@ export default function CarModal({ car, onClose }: CarModalProps) {
                 <p className="text-3xl font-light text-zinc-500">{car.preco}</p>
               </div>
 
-              {/* SIMULADOR DE FINANCIAMENTO PREMIUM */}
-              <div className="mb-8 bg-zinc-50 p-6 rounded-xl border border-zinc-200">
-                <h4 className="flex items-center gap-2 font-bold text-black mb-6">
-                  <Calculator className="w-5 h-5" /> Simular Financiamento
-                </h4>
-                
-                {/* Range Slider de Entrada */}
-                <div className="mb-6">
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-zinc-500 font-medium">Entrada ({entradaPerc}%)</span>
-                    <span className="font-bold text-black">{formatadorBR.format(valorEntrada)}</span>
-                  </div>
-                  <input 
-                    type="range" 
-                    min="0" max="90" step="5"
-                    value={entradaPerc}
-                    onChange={(e) => setEntradaPerc(Number(e.target.value))}
-                    className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-black"
-                  />
-                  <div className="flex justify-between text-xs text-zinc-400 mt-2">
-                    <span>Sem entrada</span>
-                    <span>90%</span>
-                  </div>
-                </div>
-
-                {/* Seleção de Parcelas */}
-                <div className="mb-6">
-                  <span className="text-sm text-zinc-500 font-medium block mb-3">Prazo (meses)</span>
-                  <div className="flex gap-2">
-                    {[12, 24, 36, 48, 60].map((num) => (
-                      <button
-                        key={num}
-                        onClick={() => setParcelas(num)}
-                        className={`flex-1 py-2 text-sm font-bold rounded-md transition-colors ${
-                          parcelas === num 
-                            ? 'bg-black text-white border-black' 
-                            : 'bg-white border border-zinc-300 text-zinc-600 hover:border-black hover:text-black'
-                        }`}
-                      >
-                        {num}x
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Resultado da Parcela */}
-                <div className="bg-black text-white p-4 rounded-lg flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-zinc-400 uppercase tracking-widest mb-1">Valor da Parcela</p>
-                    <p className="text-2xl font-bold">{formatadorBR.format(valorParcela)}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] text-zinc-400">Taxa est. 1,49% a.m.</p>
-                  </div>
-                </div>
-              </div>
-
+              {/* ESPECIFICAÇÕES (GRID) */}
               <div className="grid grid-cols-2 gap-6 mb-8 border-b border-zinc-100 pb-8">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-zinc-50 flex items-center justify-center text-zinc-900"><Calendar className="w-5 h-5" /></div>
@@ -242,28 +208,116 @@ export default function CarModal({ car, onClose }: CarModalProps) {
                   <div className="w-10 h-10 rounded-full bg-zinc-50 flex items-center justify-center text-zinc-900"><Gauge className="w-5 h-5" /></div>
                   <div><p className="text-xs text-zinc-400 uppercase tracking-widest">Km</p><p className="font-semibold text-zinc-900">{car.km}</p></div>
                 </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-zinc-50 flex items-center justify-center text-zinc-900"><Fuel className="w-5 h-5" /></div>
+                  <div><p className="text-xs text-zinc-400 uppercase tracking-widest">Combustível</p><p className="font-semibold text-zinc-900">{car.combustivel}</p></div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-zinc-50 flex items-center justify-center text-zinc-900"><Palette className="w-5 h-5" /></div>
+                  <div><p className="text-xs text-zinc-400 uppercase tracking-widest">Cor</p><p className="font-semibold text-zinc-900">{car.cor}</p></div>
+                </div>
               </div>
 
-              {/* CTAs (Call to Action) adaptados para o crédito */}
-              <div className="mt-auto space-y-4 pt-2">
-                <h4 className="font-bold text-black mb-4">Solicitar Pré-Aprovação</h4>
+              {/* VISÃO GERAL (LEGENDA DO CARRO) */}
+              {car.descricaoCompleta && (
+                <div className="mb-10">
+                  <h4 className="flex items-center gap-2 font-bold text-black mb-4">
+                    <ShieldCheck className="w-5 h-5" /> Visão Geral
+                  </h4>
+                  <p className="text-zinc-600 leading-relaxed text-sm">
+                    {car.descricaoCompleta}
+                  </p>
+                </div>
+              )}
+
+              {/* SIMULADOR DE FINANCIAMENTO (NOVO DESIGN PREMIUM NO FINAL) */}
+              <div className="mt-auto bg-zinc-50/80 p-6 sm:p-8 rounded-2xl border border-zinc-200">
+                <h4 className="flex items-center gap-2 font-bold text-black mb-6">
+                  <Calculator className="w-5 h-5" /> Simulação de Financiamento
+                </h4>
                 
-                <form onSubmit={handleLeadSubmit} className="grid grid-cols-2 gap-3 mb-4">
-                  <input type="text" placeholder="Nome Completo" required className="col-span-2 px-4 py-3 bg-zinc-50 border border-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all" />
-                  <input type="tel" placeholder="CPF" required className="col-span-2 sm:col-span-1 px-4 py-3 bg-zinc-50 border border-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all" />
-                  <input type="tel" placeholder="WhatsApp" required className="col-span-2 sm:col-span-1 px-4 py-3 bg-zinc-50 border border-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all" />
-                  <button type="submit" className="col-span-2 bg-black text-white font-bold text-sm uppercase tracking-widest py-4 hover:bg-zinc-800 transition-colors">
-                    Analisar Crédito Agora
+                <div className="mb-6">
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="text-zinc-500 font-medium">Entrada ({entradaPerc}%)</span>
+                    <span className="font-bold text-black">{formatadorBR.format(valorEntrada)}</span>
+                  </div>
+                  <input 
+                    type="range" min="0" max="90" step="5" value={entradaPerc}
+                    onChange={(e) => setEntradaPerc(Number(e.target.value))}
+                    className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-black"
+                  />
+                </div>
+
+                {/* BOTÕES DE PARCELAS ESTILO APPLE (SEGMENTED CONTROL) */}
+                <div className="mb-6">
+                  <span className="text-sm text-zinc-500 font-medium block mb-3">Prazo (meses)</span>
+                  <div className="flex gap-1.5 bg-zinc-200/50 p-1.5 rounded-xl">
+                    {[12, 24, 36, 48, 60].map((num) => (
+                      <button
+                        key={num}
+                        type="button"
+                        onClick={() => setParcelas(num)}
+                        className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all duration-300 ${
+                          parcelas === num 
+                            ? 'bg-white text-black shadow-sm scale-100' 
+                            : 'text-zinc-500 hover:text-black hover:bg-zinc-200/50 scale-95'
+                        }`}
+                      >
+                        {num}x
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-black text-white p-5 rounded-xl flex items-center justify-between mb-8 shadow-lg shadow-black/10">
+                  <div>
+                    <p className="text-xs text-zinc-400 uppercase tracking-widest mb-1">Valor da Parcela</p>
+                    <p className="text-3xl font-bold">{formatadorBR.format(valorParcela)}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] text-zinc-400">Taxa est. 1,49% a.m.</p>
+                  </div>
+                </div>
+                
+                {/* FORMULÁRIO DE CAPTAÇÃO (ENVIA PARA O FIREBASE) */}
+                <form onSubmit={handleLeadSubmit} className="space-y-3">
+                  <h4 className="font-bold text-black mb-3 text-sm uppercase tracking-widest border-t border-zinc-200 pt-6">Solicitar Pré-Aprovação</h4>
+                  <input 
+                    type="text" placeholder="Nome Completo" required 
+                    value={nome} onChange={(e) => setNome(e.target.value)}
+                    className="w-full px-4 py-3.5 bg-white border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all" 
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <input 
+                      type="tel" placeholder="CPF" required 
+                      value={cpf} onChange={(e) => setCpf(e.target.value)}
+                      className="w-full px-4 py-3.5 bg-white border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all" 
+                    />
+                    <input 
+                      type="tel" placeholder="WhatsApp" required 
+                      value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)}
+                      className="w-full px-4 py-3.5 bg-white border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all" 
+                    />
+                  </div>
+                  
+                  <button 
+                    type="submit" disabled={isSubmitting}
+                    className="w-full bg-black text-white font-bold text-sm uppercase tracking-widest py-4 rounded-lg hover:bg-zinc-800 transition-colors disabled:opacity-70 mt-2 shadow-lg shadow-black/20"
+                  >
+                    {isSubmitting ? 'Processando...' : 'Analisar Crédito Agora'}
                   </button>
                 </form>
 
+                <div className="mt-4 flex items-center justify-center">
+                  <span className="text-xs text-zinc-400 uppercase tracking-widest">Ou</span>
+                </div>
+
                 <a 
                   href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msgWhatsApp)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full flex items-center justify-center gap-2 border border-zinc-200 text-black font-bold text-sm uppercase tracking-widest py-4 hover:bg-zinc-50 transition-colors"
+                  target="_blank" rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-2 mt-4 border-2 border-zinc-200 text-black font-bold text-sm uppercase tracking-widest py-3.5 rounded-lg hover:bg-white hover:border-black transition-all"
                 >
-                  <MessageCircle className="w-5 h-5" /> Enviar Simulação via WhatsApp
+                  <MessageCircle className="w-5 h-5" /> Simular via WhatsApp
                 </a>
               </div>
 
