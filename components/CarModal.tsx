@@ -8,10 +8,6 @@ import {
 } from 'lucide-react';
 import { WHATSAPP_NUMBER } from '@/data/estoque';
 
-// IMPORTAÇÕES DO FIREBASE (Descomente quando for ligar o banco de dados)
-// import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-// import { db } from '@/lib/firebase'; // Ajuste para o caminho do seu arquivo de configuração do Firebase
-
 interface CarModalProps {
   car: any;
   onClose: () => void;
@@ -21,22 +17,21 @@ export default function CarModal({ car, onClose }: CarModalProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   
-  // ESTADOS DO FORMULÁRIO (Para enviar ao Firebase)
+  // ESTADOS DO FORMULÁRIO
   const [nome, setNome] = useState('');
   const [cpf, setCpf] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // ESTADOS DO SIMULADOR
+  // ESTADOS DO SIMULADOR (Agora com entrada mínima de 20%)
   const [entradaPerc, setEntradaPerc] = useState(30);
   const [parcelas, setParcelas] = useState(48);
-  const taxaJurosMensal = 0.0149;
 
   useEffect(() => {
     if (car) {
       setCurrentIndex(0);
       setIsFullscreen(false);
-      setEntradaPerc(30);
+      setEntradaPerc(30); // Reseta para 30% ao abrir novo carro
       setParcelas(48);
       setNome('');
       setCpf('');
@@ -44,17 +39,33 @@ export default function CarModal({ car, onClose }: CarModalProps) {
     }
   }, [car]);
 
+  // LÓGICA DE TAXAS DINÂMICAS BASEADAS NO PRAZO
+  const taxaJurosMensal = useMemo(() => {
+    switch (parcelas) {
+      case 12: return 0.0129; // 1,29% a.m.
+      case 24: return 0.0139; // 1,39% a.m.
+      case 36: return 0.0149; // 1,49% a.m.
+      case 48: return 0.0159; // 1,59% a.m.
+      case 60: return 0.0169; // 1,69% a.m.
+      default: return 0.0149;
+    }
+  }, [parcelas]);
+
+  // CÁLCULOS DO FINANCIAMENTO
   const { precoCarro, valorEntrada, valorFinanciado, valorParcela } = useMemo(() => {
     if (!car) return { precoCarro: 0, valorEntrada: 0, valorFinanciado: 0, valorParcela: 0 };
+    
     const preco = Number(car.preco.replace(/[^0-9]/g, ''));
     const entrada = (preco * entradaPerc) / 100;
     const financiado = preco - entrada;
+    
     let parcela = 0;
     if (financiado > 0) {
       parcela = (financiado * taxaJurosMensal) / (1 - Math.pow(1 + taxaJurosMensal, -parcelas));
     }
+    
     return { precoCarro: preco, valorEntrada: entrada, valorFinanciado: financiado, valorParcela: parcela };
-  }, [car, entradaPerc, parcelas]);
+  }, [car, entradaPerc, parcelas, taxaJurosMensal]);
 
   const formatadorBR = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -79,42 +90,14 @@ export default function CarModal({ car, onClose }: CarModalProps) {
     else if (offset.x > limiarDeArrasto) prevImage();
   };
 
-  // FUNÇÃO QUE SALVA NO BANCO DE DADOS
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    try {
-      /* CÓDIGO DO FIREBASE (Descomente para funcionar de verdade)
-      await addDoc(collection(db, 'leads_financiamento'), {
-        nome: nome,
-        cpf: cpf,
-        whatsapp: whatsapp,
-        carro_id: car.id,
-        carro_modelo: `${car.marca} ${car.modelo}`,
-        simulacao: {
-          entrada_percentual: entradaPerc,
-          valor_entrada: valorEntrada,
-          parcelas: parcelas,
-          valor_parcela: valorParcela
-        },
-        status: 'Novo Lead',
-        data_criacao: serverTimestamp()
-      });
-      */
-
-      // Simulação visual de carregamento
-      setTimeout(() => {
-        alert('Dados enviados com sucesso! Nosso consultor entrará em contato para a aprovação.');
-        setIsSubmitting(false);
-        onClose();
-      }, 1000);
-
-    } catch (error) {
-      console.error("Erro ao salvar:", error);
-      alert('Ocorreu um erro. Tente novamente.');
+    setTimeout(() => {
+      alert('Dados enviados com sucesso! Nosso consultor entrará em contato para a aprovação.');
       setIsSubmitting(false);
-    }
+      onClose();
+    }, 1000);
   };
 
   const msgWhatsApp = `Olá! Sou um cliente VIP e tenho interesse no ${car.marca} ${car.modelo}. Fiz uma simulação com entrada de ${formatadorBR.format(valorEntrada)} e vi as parcelas em ${parcelas}x de ${formatadorBR.format(valorParcela)}. Gostaria de seguir com a pré-aprovação.`;
@@ -185,10 +168,9 @@ export default function CarModal({ car, onClose }: CarModalProps) {
               )}
             </div>
             
-            {/* LADO DIREITO: INFORMAÇÕES E SIMULADOR */}
+            {/* LADO DIREITO */}
             <div className="w-full lg:w-2/5 p-8 sm:p-10 lg:p-12 flex flex-col bg-white overflow-y-auto max-h-[55vh] lg:max-h-none custom-scrollbar">
               
-              {/* HEADER DO CARRO */}
               <div className="mb-6 border-b border-zinc-100 pb-6">
                 <div className="flex items-center gap-3 mb-3">
                   <span className="text-xs font-bold bg-zinc-100 text-zinc-800 px-3 py-1 uppercase tracking-widest rounded-sm">{car.marca}</span>
@@ -198,7 +180,6 @@ export default function CarModal({ car, onClose }: CarModalProps) {
                 <p className="text-3xl font-light text-zinc-500">{car.preco}</p>
               </div>
 
-              {/* ESPECIFICAÇÕES (GRID) */}
               <div className="grid grid-cols-2 gap-6 mb-8 border-b border-zinc-100 pb-8">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-zinc-50 flex items-center justify-center text-zinc-900"><Calendar className="w-5 h-5" /></div>
@@ -218,7 +199,6 @@ export default function CarModal({ car, onClose }: CarModalProps) {
                 </div>
               </div>
 
-              {/* VISÃO GERAL (LEGENDA DO CARRO) */}
               {car.descricaoCompleta && (
                 <div className="mb-10">
                   <h4 className="flex items-center gap-2 font-bold text-black mb-4">
@@ -230,7 +210,7 @@ export default function CarModal({ car, onClose }: CarModalProps) {
                 </div>
               )}
 
-              {/* SIMULADOR DE FINANCIAMENTO (NOVO DESIGN PREMIUM NO FINAL) */}
+              {/* SIMULADOR DE FINANCIAMENTO COM ENTRADA MÍNIMA E TAXA DINÂMICA */}
               <div className="mt-auto bg-zinc-50/80 p-6 sm:p-8 rounded-2xl border border-zinc-200">
                 <h4 className="flex items-center gap-2 font-bold text-black mb-6">
                   <Calculator className="w-5 h-5" /> Simulação de Financiamento
@@ -241,26 +221,26 @@ export default function CarModal({ car, onClose }: CarModalProps) {
                     <span className="text-zinc-500 font-medium">Entrada ({entradaPerc}%)</span>
                     <span className="font-bold text-black">{formatadorBR.format(valorEntrada)}</span>
                   </div>
+                  {/* LIMITADO PARA 20% DE ENTRADA MÍNIMA */}
                   <input 
-                    type="range" min="0" max="90" step="5" value={entradaPerc}
+                    type="range" min="20" max="90" step="5" value={entradaPerc}
                     onChange={(e) => setEntradaPerc(Number(e.target.value))}
                     className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-black"
                   />
+                  <div className="flex justify-between text-xs text-zinc-400 mt-2">
+                    <span>Mínimo 20%</span>
+                    <span>90%</span>
+                  </div>
                 </div>
 
-                {/* BOTÕES DE PARCELAS ESTILO APPLE (SEGMENTED CONTROL) */}
                 <div className="mb-6">
                   <span className="text-sm text-zinc-500 font-medium block mb-3">Prazo (meses)</span>
                   <div className="flex gap-1.5 bg-zinc-200/50 p-1.5 rounded-xl">
                     {[12, 24, 36, 48, 60].map((num) => (
                       <button
-                        key={num}
-                        type="button"
-                        onClick={() => setParcelas(num)}
+                        key={num} type="button" onClick={() => setParcelas(num)}
                         className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all duration-300 ${
-                          parcelas === num 
-                            ? 'bg-white text-black shadow-sm scale-100' 
-                            : 'text-zinc-500 hover:text-black hover:bg-zinc-200/50 scale-95'
+                          parcelas === num ? 'bg-white text-black shadow-sm scale-100' : 'text-zinc-500 hover:text-black hover:bg-zinc-200/50 scale-95'
                         }`}
                       >
                         {num}x
@@ -275,27 +255,24 @@ export default function CarModal({ car, onClose }: CarModalProps) {
                     <p className="text-3xl font-bold">{formatadorBR.format(valorParcela)}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] text-zinc-400">Taxa est. 1,49% a.m.</p>
+                    {/* Exibe a taxa de forma dinâmica, ajustando a casa decimal */}
+                    <p className="text-[10px] text-zinc-400">Taxa est. {(taxaJurosMensal * 100).toFixed(2).replace('.', ',')}% a.m.</p>
                   </div>
                 </div>
                 
-                {/* FORMULÁRIO DE CAPTAÇÃO (ENVIA PARA O FIREBASE) */}
                 <form onSubmit={handleLeadSubmit} className="space-y-3">
                   <h4 className="font-bold text-black mb-3 text-sm uppercase tracking-widest border-t border-zinc-200 pt-6">Solicitar Pré-Aprovação</h4>
                   <input 
-                    type="text" placeholder="Nome Completo" required 
-                    value={nome} onChange={(e) => setNome(e.target.value)}
+                    type="text" placeholder="Nome Completo" required value={nome} onChange={(e) => setNome(e.target.value)}
                     className="w-full px-4 py-3.5 bg-white border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all" 
                   />
                   <div className="grid grid-cols-2 gap-3">
                     <input 
-                      type="tel" placeholder="CPF" required 
-                      value={cpf} onChange={(e) => setCpf(e.target.value)}
+                      type="tel" placeholder="CPF" required value={cpf} onChange={(e) => setCpf(e.target.value)}
                       className="w-full px-4 py-3.5 bg-white border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all" 
                     />
                     <input 
-                      type="tel" placeholder="WhatsApp" required 
-                      value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)}
+                      type="tel" placeholder="WhatsApp" required value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)}
                       className="w-full px-4 py-3.5 bg-white border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all" 
                     />
                   </div>
