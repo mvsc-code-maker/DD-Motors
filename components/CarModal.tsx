@@ -8,6 +8,10 @@ import {
 } from 'lucide-react';
 import { WHATSAPP_NUMBER } from '@/data/estoque';
 
+// IMPORTAÇÕES DO FIREBASE (Descomente quando for ligar o banco de dados)
+// import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+// import { db } from '@/lib/firebase';
+
 interface CarModalProps {
   car: any;
   onClose: () => void;
@@ -23,15 +27,19 @@ export default function CarModal({ car, onClose }: CarModalProps) {
   const [whatsapp, setWhatsapp] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // ESTADOS DO SIMULADOR (Agora com entrada mínima de 20%)
-  const [entradaPerc, setEntradaPerc] = useState(30);
+  // ESTADOS DO SIMULADOR (Agora com valor exato em Reais)
+  const [valorEntrada, setValorEntrada] = useState(0);
   const [parcelas, setParcelas] = useState(48);
+
+  const precoCarro = car ? Number(car.preco.replace(/[^0-9]/g, '')) : 0;
+  const minEntrada = precoCarro * 0.20; // 20%
+  const maxEntrada = precoCarro * 0.90; // 90%
 
   useEffect(() => {
     if (car) {
       setCurrentIndex(0);
       setIsFullscreen(false);
-      setEntradaPerc(30); // Reseta para 30% ao abrir novo carro
+      setValorEntrada(Number(car.preco.replace(/[^0-9]/g, '')) * 0.3); // Padrão 30% inicial
       setParcelas(48);
       setNome('');
       setCpf('');
@@ -52,22 +60,35 @@ export default function CarModal({ car, onClose }: CarModalProps) {
   }, [parcelas]);
 
   // CÁLCULOS DO FINANCIAMENTO
-  const { precoCarro, valorEntrada, valorFinanciado, valorParcela } = useMemo(() => {
-    if (!car) return { precoCarro: 0, valorEntrada: 0, valorFinanciado: 0, valorParcela: 0 };
-    
-    const preco = Number(car.preco.replace(/[^0-9]/g, ''));
-    const entrada = (preco * entradaPerc) / 100;
-    const financiado = preco - entrada;
+  const { valorFinanciado, valorParcela, percentualEntrada } = useMemo(() => {
+    let financiado = precoCarro - valorEntrada;
+    if (financiado < 0) financiado = 0;
     
     let parcela = 0;
     if (financiado > 0) {
       parcela = (financiado * taxaJurosMensal) / (1 - Math.pow(1 + taxaJurosMensal, -parcelas));
     }
     
-    return { precoCarro: preco, valorEntrada: entrada, valorFinanciado: financiado, valorParcela: parcela };
-  }, [car, entradaPerc, parcelas, taxaJurosMensal]);
+    const percentual = precoCarro > 0 ? Math.round((valorEntrada / precoCarro) * 100) : 30;
+    
+    return { valorFinanciado: financiado, valorParcela: parcela, percentualEntrada: percentual };
+  }, [precoCarro, valorEntrada, parcelas, taxaJurosMensal]);
 
   const formatadorBR = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  // FUNÇÕES DO CAMPO DIGITÁVEL DE ENTRADA
+  const handleEntradaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Remove tudo que não for número e converte para decimal
+    const rawValue = e.target.value.replace(/\D/g, '');
+    const numValue = Number(rawValue) / 100;
+    setValorEntrada(numValue);
+  };
+
+  const handleEntradaBlur = () => {
+    // Valida se o cliente tentou colocar menos que 20% ou mais que 90%
+    if (valorEntrada < minEntrada) setValorEntrada(minEntrada);
+    if (valorEntrada > maxEntrada) setValorEntrada(maxEntrada);
+  };
 
   if (!car) return null;
 
@@ -210,25 +231,35 @@ export default function CarModal({ car, onClose }: CarModalProps) {
                 </div>
               )}
 
-              {/* SIMULADOR DE FINANCIAMENTO COM ENTRADA MÍNIMA E TAXA DINÂMICA */}
+              {/* SIMULADOR DE FINANCIAMENTO COM CAMPO DIGITÁVEL */}
               <div className="mt-auto bg-zinc-50/80 p-6 sm:p-8 rounded-2xl border border-zinc-200">
                 <h4 className="flex items-center gap-2 font-bold text-black mb-6">
                   <Calculator className="w-5 h-5" /> Simulação de Financiamento
                 </h4>
                 
                 <div className="mb-6">
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-zinc-500 font-medium">Entrada ({entradaPerc}%)</span>
-                    <span className="font-bold text-black">{formatadorBR.format(valorEntrada)}</span>
+                  <div className="flex justify-between items-center text-sm mb-3">
+                    <span className="text-zinc-500 font-medium">Entrada ({percentualEntrada}%)</span>
+                    
+                    {/* CAMPO ONDE O USUÁRIO DIGITA O VALOR DA ENTRADA */}
+                    <input 
+                      type="text" 
+                      value={formatadorBR.format(valorEntrada)}
+                      onChange={handleEntradaChange}
+                      onBlur={handleEntradaBlur}
+                      className="text-right font-bold text-lg text-black bg-white border border-zinc-200 rounded-lg px-3 py-1.5 w-40 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
+                    />
                   </div>
-                  {/* LIMITADO PARA 20% DE ENTRADA MÍNIMA */}
+
+                  {/* SLIDER QUE ANDA JUNTO COM O QUE ELE DIGITA */}
                   <input 
-                    type="range" min="20" max="90" step="5" value={entradaPerc}
-                    onChange={(e) => setEntradaPerc(Number(e.target.value))}
+                    type="range" min={minEntrada} max={maxEntrada} step={1000} 
+                    value={valorEntrada}
+                    onChange={(e) => setValorEntrada(Number(e.target.value))}
                     className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-black"
                   />
                   <div className="flex justify-between text-xs text-zinc-400 mt-2">
-                    <span>Mínimo 20%</span>
+                    <span>Mín. {formatadorBR.format(minEntrada)}</span>
                     <span>90%</span>
                   </div>
                 </div>
@@ -255,7 +286,6 @@ export default function CarModal({ car, onClose }: CarModalProps) {
                     <p className="text-3xl font-bold">{formatadorBR.format(valorParcela)}</p>
                   </div>
                   <div className="text-right">
-                    {/* Exibe a taxa de forma dinâmica, ajustando a casa decimal */}
                     <p className="text-[10px] text-zinc-400">Taxa est. {(taxaJurosMensal * 100).toFixed(2).replace('.', ',')}% a.m.</p>
                   </div>
                 </div>
