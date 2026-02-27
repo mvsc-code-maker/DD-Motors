@@ -2,21 +2,21 @@ export const estoqueCarros = [
   {
     id: 1,
     marca: 'Porsche',
-    modelo: '718 Boxster 2.0',
-    ano: '2022',
-    km: '15.000',
+    modelo: '911 Carrera S',
+    ano: '2023',
+    km: '4.500',
     combustivel: 'Gasolina',
-    carroceria: 'Conversível',
-    cor: 'Branco',
-    preco: 'R$ 650.000',
-    imagem: 'https://placehold.co/800x500/1a1a1a/ffffff?text=Porsche+718',
+    carroceria: 'Coupé',
+    cor: 'Prata',
+    preco: 'R$ 1.150.000',
+    imagem: 'https://images.unsplash.com/photo-1503376760367-1b61216b3b5c?w=800&q=80',
     galeria: [
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=Porsche+718',
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=Porsche+Traseira',
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=Porsche+Interior',
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=Porsche+Motor'
+      'https://images.unsplash.com/photo-1503376760367-1b61216b3b5c?w=800&q=80',
+      'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800&q=80',
+      'https://images.unsplash.com/photo-1601362840469-51e4d8d58785?w=800&q=80',
+      'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80'
     ],
-    descricaoCompleta: 'Veículo impecável. Motor 2.0 turbo de 300cv, capota em lona vermelha e interior em couro Bordeaux. Revisões em dia na Stuttgart.',
+    descricaoCompleta: 'A lenda automotiva. Motor boxer biturbo de 450cv, pacote Sport Chrono, escape esportivo e interior impecável em couro vermelho Bordeaux. Carro vitrificado e com PPF frontal.',
     badge: 'Pronta Entrega'
   },
   {
@@ -29,13 +29,13 @@ export const estoqueCarros = [
     carroceria: 'SUV',
     cor: 'Preto',
     preco: 'R$ 1.200.000',
-    imagem: 'https://placehold.co/800x500/1a1a1a/ffffff?text=BMW+X6+M',
+    imagem: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&q=80',
     galeria: [
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=BMW+X6+M',
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=X6M+Traseira',
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=X6M+Painel'
+      'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&q=80',
+      'https://images.unsplash.com/photo-1556189250-72ba954cfc2b?w=800&q=80',
+      'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800&q=80'
     ],
-    descricaoCompleta: 'SUV de altíssima performance com motor V8 Biturbo de 625cv. Conta com pacote carbono interno, som Harman Kardon e rodas aro 22.',
+    descricaoCompleta: 'SUV de altíssima performance com motor V8 Biturbo de 625cv. Conta com pacote carbono interno, som Harman Kardon e rodas aro 22. Bruto e luxuoso.',
     badge: 'Estoque Limitado'
   },
   {
@@ -48,70 +48,13 @@ export const estoqueCarros = [
     carroceria: 'Sedã',
     cor: 'Cinza',
     preco: 'R$ 450.000',
-    imagem: 'https://placehold.co/800x500/1a1a1a/ffffff?text=Mercedes+C300',
+    imagem: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&q=80',
     galeria: [
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=Mercedes+C300',
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=Mercedes+Traseira',
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=Mercedes+Interior'
+      'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&q=80',
+      'https://images.unsplash.com/photo-1605515298946-d062f2e9da53?w=800&q=80',
+      'https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800&q=80'
     ],
-    descricaoCompleta: 'Sedã de luxo com tecnologia híbrida leve, combinando eficiência e performance. Pacote visual AMG Line, teto solar panorâmico e interior com iluminação ambiente configurável.',
-    badge: 'Pronta Entrega'
-  },
-  {
-    id: 4,
-    marca: 'Audi',
-    modelo: 'RS6 Avant',
-    ano: '2021',
-    km: '22.000',
-    combustivel: 'Gasolina',
-    carroceria: 'Perua',
-    cor: 'Azul',
-    preco: 'R$ 1.150.000',
-    imagem: 'https://placehold.co/800x500/1a1a1a/ffffff?text=Audi+RS6',
-    galeria: [
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=Audi+RS6',
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=RS6+Lateral',
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=RS6+Interior'
-    ],
-    descricaoCompleta: 'A super perua definitiva. Motor V8 biturbo com 600cv, tração quattro e suspensão adaptativa. Acabamento interno em fibra de carbono e bancos esportivos RS.',
-    badge: ''
-  },
-  {
-    id: 5,
-    marca: 'Land Rover',
-    modelo: 'Range Rover Velar',
-    ano: '2022',
-    km: '18.000',
-    combustivel: 'Diesel',
-    carroceria: 'SUV',
-    cor: 'Branco',
-    preco: 'R$ 580.000',
-    imagem: 'https://placehold.co/800x500/1a1a1a/ffffff?text=Range+Rover+Velar',
-    galeria: [
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=Range+Rover+Velar',
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=Velar+Lateral',
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=Velar+Painel'
-    ],
-    descricaoCompleta: 'Design minimalista e elegante. Motorização diesel com excelente torque e autonomia. Sistema multimídia Pivi Pro, faróis Matrix LED e teto panorâmico.',
-    badge: 'Estoque Limitado'
-  },
-  {
-    id: 6,
-    marca: 'Volvo',
-    modelo: 'XC90 Recharge',
-    ano: '2023',
-    km: '10.000',
-    combustivel: 'Híbrido',
-    carroceria: 'SUV',
-    cor: 'Preto',
-    preco: 'R$ 520.000',
-    imagem: 'https://placehold.co/800x500/1a1a1a/ffffff?text=Volvo+XC90',
-    galeria: [
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=Volvo+XC90',
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=XC90+Traseira',
-      'https://placehold.co/800x500/1a1a1a/ffffff?text=XC90+Bancos'
-    ],
-    descricaoCompleta: 'O máximo em segurança e conforto escandinavo. Híbrido plug-in com 7 lugares, sistema de som Bowers & Wilkins e Pilot Assist para condução semiautônoma.',
+    descricaoCompleta: 'Sedã de luxo com tecnologia híbrida leve. Pacote visual AMG Line, teto solar panorâmico e interior com iluminação ambiente configurável em 64 cores.',
     badge: 'Pronta Entrega'
   }
 ];
