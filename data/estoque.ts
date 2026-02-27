@@ -10,6 +10,13 @@ export const estoqueCarros = [
     cor: 'Branco',
     preco: 'R$ 650.000',
     imagem: 'https://placehold.co/800x500/1a1a1a/ffffff?text=Porsche+718',
+    galeria: [
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=Porsche+718',
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=Porsche+Traseira',
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=Porsche+Interior',
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=Porsche+Motor'
+    ],
+    descricaoCompleta: 'Veículo impecável. Motor 2.0 turbo de 300cv, capota em lona vermelha e interior em couro Bordeaux. Revisões em dia na Stuttgart.',
     badge: 'Pronta Entrega'
   },
   {
@@ -23,6 +30,12 @@ export const estoqueCarros = [
     cor: 'Preto',
     preco: 'R$ 1.200.000',
     imagem: 'https://placehold.co/800x500/1a1a1a/ffffff?text=BMW+X6+M',
+    galeria: [
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=BMW+X6+M',
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=X6M+Traseira',
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=X6M+Painel'
+    ],
+    descricaoCompleta: 'SUV de altíssima performance com motor V8 Biturbo de 625cv. Conta com pacote carbono interno, som Harman Kardon e rodas aro 22.',
     badge: 'Estoque Limitado'
   },
   {
@@ -36,6 +49,12 @@ export const estoqueCarros = [
     cor: 'Cinza',
     preco: 'R$ 450.000',
     imagem: 'https://placehold.co/800x500/1a1a1a/ffffff?text=Mercedes+C300',
+    galeria: [
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=Mercedes+C300',
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=Mercedes+Traseira',
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=Mercedes+Interior'
+    ],
+    descricaoCompleta: 'Sedã de luxo com tecnologia híbrida leve, combinando eficiência e performance. Pacote visual AMG Line, teto solar panorâmico e interior com iluminação ambiente configurável.',
     badge: 'Pronta Entrega'
   },
   {
@@ -49,6 +68,12 @@ export const estoqueCarros = [
     cor: 'Azul',
     preco: 'R$ 1.150.000',
     imagem: 'https://placehold.co/800x500/1a1a1a/ffffff?text=Audi+RS6',
+    galeria: [
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=Audi+RS6',
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=RS6+Lateral',
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=RS6+Interior'
+    ],
+    descricaoCompleta: 'A super perua definitiva. Motor V8 biturbo com 600cv, tração quattro e suspensão adaptativa. Acabamento interno em fibra de carbono e bancos esportivos RS.',
     badge: ''
   },
   {
@@ -62,6 +87,12 @@ export const estoqueCarros = [
     cor: 'Branco',
     preco: 'R$ 580.000',
     imagem: 'https://placehold.co/800x500/1a1a1a/ffffff?text=Range+Rover+Velar',
+    galeria: [
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=Range+Rover+Velar',
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=Velar+Lateral',
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=Velar+Painel'
+    ],
+    descricaoCompleta: 'Design minimalista e elegante. Motorização diesel com excelente torque e autonomia. Sistema multimídia Pivi Pro, faróis Matrix LED e teto panorâmico.',
     badge: 'Estoque Limitado'
   },
   {
@@ -75,6 +106,12 @@ export const estoqueCarros = [
     cor: 'Preto',
     preco: 'R$ 520.000',
     imagem: 'https://placehold.co/800x500/1a1a1a/ffffff?text=Volvo+XC90',
+    galeria: [
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=Volvo+XC90',
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=XC90+Traseira',
+      'https://placehold.co/800x500/1a1a1a/ffffff?text=XC90+Bancos'
+    ],
+    descricaoCompleta: 'O máximo em segurança e conforto escandinavo. Híbrido plug-in com 7 lugares, sistema de som Bowers & Wilkins e Pilot Assist para condução semiautônoma.',
     badge: 'Pronta Entrega'
   }
 ];
