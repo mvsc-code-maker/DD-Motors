@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Star, ShieldCheck, ThumbsUp } from 'lucide-react';
+import { Star, ShieldCheck, ThumbsUp, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { estoqueCarros, avaliacoes } from '@/data/estoque';
 import CarCard from '@/components/CarCard';
@@ -24,7 +24,7 @@ export default function Home() {
 
   return (
     <>
-      {/* HERO SECTION - Ajustado para não sobrepor o menu */}
+      {/* HERO SECTION */}
       <section id="home" className="relative h-[85vh] min-h-[600px] bg-black overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
@@ -92,7 +92,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ABOUT US - As âncoras (id="sobre" e id="avaliacoes") estão exatas para o menu encontrar */}
+      {/* ABOUT US */}
       <section id="sobre" className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -125,7 +125,7 @@ export default function Home() {
             <div className="relative mt-8 lg:mt-0">
               <div className="aspect-square bg-zinc-100 overflow-hidden">
                 <img 
-                  src="https://placehold.co/800x800/1a1a1a/ffffff?text=Showroom+DD+Motors" 
+                  src="https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=800&q=80" 
                   alt="Showroom DD Motors"
                   className="w-full h-full object-cover"
                 />
@@ -139,7 +139,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* TESTIMONIALS */}
+      {/* TESTIMONIALS (ATUALIZADO COM LINKS DO GOOGLE) */}
       <section id="avaliacoes" className="py-24 bg-black text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12 sm:mb-16">
@@ -149,13 +149,29 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {avaliacoes.map((av, i) => (
-              <div key={i} className="bg-zinc-900 p-6 sm:p-8 border border-zinc-800">
-                <div className="flex gap-1 mb-6">
-                  {[1,2,3,4,5].map(star => <Star key={star} className="w-4 h-4 sm:w-5 sm:h-5 fill-white text-white" />)}
+              <a 
+                key={i} 
+                href={av.link || '#'} // Usa o link do estoque.ts ou previne erro
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block bg-zinc-900 p-6 sm:p-8 border border-zinc-800 hover:border-zinc-500 hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+              >
+                <div className="flex justify-between items-start mb-6">
+                  <div className="flex gap-1">
+                    {[1,2,3,4,5].map(star => <Star key={star} className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-500 text-yellow-500" />)}
+                  </div>
+                  <ExternalLink className="w-4 h-4 text-zinc-600 group-hover:text-white transition-colors opacity-0 group-hover:opacity-100" />
                 </div>
-                <p className="text-zinc-300 mb-6 sm:mb-8 leading-relaxed text-sm sm:text-base">&quot;{av.texto}&quot;</p>
-                <p className="font-bold uppercase tracking-wider text-xs sm:text-sm">{av.nome}</p>
-              </div>
+                
+                <p className="text-zinc-300 mb-6 sm:mb-8 leading-relaxed text-sm sm:text-base italic">&quot;{av.texto}&quot;</p>
+                
+                <div className="flex items-center justify-between border-t border-zinc-800 pt-4 mt-auto">
+                  <p className="font-bold uppercase tracking-wider text-xs sm:text-sm">{av.nome}</p>
+                  <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold group-hover:text-blue-400 transition-colors">
+                    Ver no Google
+                  </p>
+                </div>
+              </a>
             ))}
           </div>
         </div>
