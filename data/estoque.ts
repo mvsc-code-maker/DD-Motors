@@ -114,9 +114,21 @@ export const estoqueCarros = [
 ];
 
 export const avaliacoes = [
-  { nome: 'Sr. David', texto: 'Atendimento impecável. Comprei minha BMW e o processo foi super transparente. Recomendo a DD Motors de olhos fechados!' },
-  { nome: 'Luciano Caldeira', texto: 'Carros de altíssima qualidade. A equipe me ajudou a encontrar exatamente o que eu procurava. Excelência pura.' },
-  { nome: 'Danilo Campos', texto: 'Melhor loja de importados de Guarulhos. Negociação justa e carros em estado de zero. Voltarei com certeza.' }
+  { 
+    nome: 'Sr. David', 
+    texto: 'Atendimento impecável. Comprei minha BMW e o processo foi super transparente. Recomendo a DD Motors de olhos fechados!',
+    link: 'https://maps.google.com/?cid=2706043707173869116&g_mp=CiVnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLkdldFBsYWNl' // Link oficial do seu Google Maps
+  },
+  { 
+    nome: 'Luciano Caldeira', 
+    texto: 'Carros de altíssima qualidade. A equipe me ajudou a encontrar exatamente o que eu procurava. Excelência pura.',
+    link: 'https://maps.google.com/?cid=2706043707173869116&g_mp=CiVnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLkdldFBsYWNl'
+  },
+  { 
+    nome: 'Danilo Campos', 
+    texto: 'Melhor loja de importados de Guarulhos. Negociação justa e carros em estado de zero. Voltarei com certeza.',
+    link: 'https://maps.google.com/?cid=2706043707173869116&g_mp=CiVnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLkdldFBsYWNl'
+  }
 ];
 
 export const WHATSAPP_NUMBER = "5511986848481";
