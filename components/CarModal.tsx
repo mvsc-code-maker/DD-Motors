@@ -24,8 +24,8 @@ export default function CarModal({ car, onClose }: { car: any; onClose: () => vo
   const minEntrada = precoCarro * 0.20; // 20%
   const maxEntrada = precoCarro * 0.90; // 90%
 
-  // Verifica se a entrada digitada é menor que o mínimo exigido
-  const isEntradaInvalida = valorEntrada > 0 && valorEntrada < minEntrada;
+  // CORREÇÃO: Agora qualquer valor menor que o mínimo (incluindo ZERO) trava o sistema.
+  const isEntradaInvalida = valorEntrada < minEntrada;
 
   useEffect(() => {
     if (car) {
@@ -70,7 +70,6 @@ export default function CarModal({ car, onClose }: { car: any; onClose: () => vo
   };
 
   const handleEntradaBlur = () => {
-    // Agora não forçamos mais para o mínimo, apenas travamos o máximo para não passar do valor do carro
     if (valorEntrada > maxEntrada) setValorEntrada(maxEntrada);
   };
 
@@ -85,7 +84,7 @@ export default function CarModal({ car, onClose }: { car: any; onClose: () => vo
 
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isEntradaInvalida) return; // Trava extra de segurança
+    if (isEntradaInvalida) return;
     setIsSubmitting(true);
     setTimeout(() => {
       alert('Dados enviados com sucesso! Nosso consultor entrará em contato para a aprovação.');
@@ -187,7 +186,7 @@ export default function CarModal({ car, onClose }: { car: any; onClose: () => vo
                 </div>
               )}
 
-              {/* SIMULADOR COM BLOQUEIO DE ENTRADA */}
+              {/* SIMULADOR COM BLOQUEIO DE ENTRADA (INCLUSIVE ZERO) */}
               <div className="mt-auto bg-zinc-50/80 p-6 sm:p-8 rounded-2xl border border-zinc-200">
                 <h4 className="flex items-center gap-2 font-bold text-black mb-6"><Calculator className="w-5 h-5" /> Simulação de Financiamento</h4>
                 
@@ -210,7 +209,6 @@ export default function CarModal({ car, onClose }: { car: any; onClose: () => vo
                     />
                   </div>
                   
-                  {/* ALERTA DE ERRO DE ENTRADA */}
                   <AnimatePresence>
                     {isEntradaInvalida && (
                       <motion.div 
@@ -260,7 +258,6 @@ export default function CarModal({ car, onClose }: { car: any; onClose: () => vo
                     <input type="tel" placeholder="WhatsApp" disabled={isEntradaInvalida} required value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} className="w-full px-4 py-3.5 bg-white border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all disabled:opacity-50 disabled:bg-zinc-100" />
                   </div>
                   
-                  {/* BOTÃO PRINCIPAL COM BLOQUEIO */}
                   <button 
                     type="submit" disabled={isSubmitting || isEntradaInvalida}
                     className={`w-full font-bold text-sm uppercase tracking-widest py-4 rounded-lg transition-colors mt-2 ${
@@ -275,7 +272,6 @@ export default function CarModal({ car, onClose }: { car: any; onClose: () => vo
 
                 <div className="mt-4 flex items-center justify-center"><span className="text-xs text-zinc-400 uppercase tracking-widest">Ou</span></div>
 
-                {/* BOTÃO DO WHATSAPP COM BLOQUEIO */}
                 <a 
                   href={isEntradaInvalida ? '#' : `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msgWhatsApp)}`}
                   target={isEntradaInvalida ? '_self' : '_blank'} rel="noopener noreferrer"
