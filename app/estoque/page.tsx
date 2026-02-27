@@ -18,6 +18,7 @@ export default function Estoque() {
   const [filtroCombustivel, setFiltroCombustivel] = useState('');
   const [filtroAno, setFiltroAno] = useState('');
 
+  // 1. FILTRAGEM DOS CARROS (Mantida a sua lógica original)
   const carrosFiltrados = useMemo(() => {
     return estoqueCarros.filter(carro => {
       if (busca) {
@@ -34,10 +35,12 @@ export default function Estoque() {
     });
   }, [busca, filtroMarca, filtroCarroceria, filtroCombustivel, filtroAno]);
 
-  const marcas = Array.from(new Set(estoqueCarros.map(c => c.marca)));
-  const carrocerias = Array.from(new Set(estoqueCarros.map(c => c.carroceria)));
-  const combustiveis = Array.from(new Set(estoqueCarros.map(c => c.combustivel)));
-  const anos = Array.from(new Set(estoqueCarros.map(c => c.ano))).sort().reverse();
+  // 2. ATUALIZAÇÃO: OPÇÕES DINÂMICAS BASEADAS NO QUE SOBROU NA TELA
+  // Agora as listas usam "carrosFiltrados" em vez de "estoqueCarros"
+  const marcas = Array.from(new Set(carrosFiltrados.map(c => c.marca))).sort();
+  const carrocerias = Array.from(new Set(carrosFiltrados.map(c => c.carroceria))).sort();
+  const combustiveis = Array.from(new Set(carrosFiltrados.map(c => c.combustivel))).sort();
+  const anos = Array.from(new Set(carrosFiltrados.map(c => c.ano))).sort().reverse();
 
   const clearFilters = () => {
     setBusca('');
