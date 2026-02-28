@@ -10,12 +10,12 @@ export const estoqueCarros = [
     cor: 'Branco',
     preco: 'R$ 650.000',
     imagem: 'https://images.unsplash.com/photo-1503376760367-1b61216b3b5c?w=800&q=80',
-    galeria: [
-      'https://images.unsplash.com/photo-1503376760367-1b61216b3b5c?w=800&q=80',
-      'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800&q=80',
-      'https://images.unsplash.com/photo-1601362840469-51e4d8d58785?w=800&q=80',
-      'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80'
-    ],
+galeria: [
+  '/porsche1.jpg',
+  '/porsche2.jpg',
+  '/porsche3.jpg',
+  '/porsche4.jpg'
+],
     descricaoCompleta: 'Veículo impecável. Motor 2.0 turbo de 300cv, capota em lona vermelha e interior em couro Bordeaux. Revisões em dia na Stuttgart.',
     badge: 'Pronta Entrega'
   },
