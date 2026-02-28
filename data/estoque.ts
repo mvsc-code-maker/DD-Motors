@@ -11,7 +11,7 @@ export const estoqueCarros = [
     preco: 'R$ 650.000',
     imagem: 'https://images.unsplash.com/photo-1503376760367-1b61216b3b5c?w=800&q=80',
 galeria: [
-  '/porsche1.jpg',
+  '/porsche 1.jpg',
   '/porsche2.jpg',
   '/porsche3.jpg',
   '/porsche4.jpg'
